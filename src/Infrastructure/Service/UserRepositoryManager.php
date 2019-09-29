@@ -45,7 +45,14 @@ class UserRepositoryManager
         }
 
         if (empty($srcFolderSha)) {
-            throw new \Exception('Error: Given GitHub Repository does not contain src directory.');
+            // If src folder was not found, maybe it's because there are no more API calls left
+            $rateLimit = $this->getRateLimit();
+            if ($rateLimit->getRemaining() == 0) {
+                throw new \Exception('Error: ' . $rateLimit->__toString());
+            }
+
+            // There are still API calls, so maybe there was a typo or src folder really doesn't exist
+            throw new \Exception('Error: Repository does not contain src directory.');
         }
 
         $this->processGithubRecursiveTree($srcFolderSha);
@@ -64,8 +71,10 @@ class UserRepositoryManager
     {
         $apiCallRecursively = false;
 
+        // Try a unique call in order to not waste free API calls
         $treeData = $this->githubApi->getTree($this->userName, $this->repositoryName, $folderSha, true);
 
+        // If call is truncated, because repository is too wide, recursive calls will be needed
         if ($treeData['truncated']) {
             $apiCallRecursively = true;
             $treeData = $this->githubApi->getTree($this->userName, $this->repositoryName, $folderSha, false);
