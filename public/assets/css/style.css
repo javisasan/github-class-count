@@ -1,0 +1,21 @@
+body {
+    margin: 10px;
+}
+
+.git-title {
+    color: #999;
+}
+
+.form-control {
+    max-width: 100px;
+    display: inline-block;
+}
+
+input {
+    color: #d82424;
+}
+
+.table {
+    margin: 20px;
+    max-width: 500px;
+}

@@ -19,7 +19,7 @@ class UserRepositoryEntity
     /** @var  RateLimit */
     private $rateLimit;
 
-    public function __construct(string $userName, string $repositoryName, ClassWords $classWords, RateLimit $rateLimit)
+    public function __construct(string $userName, string $repositoryName, ClassWords $classWords = null, RateLimit $rateLimit = null)
     {
         $this->userName         = $userName;
         $this->repositoryName   = $repositoryName;
@@ -32,9 +32,21 @@ class UserRepositoryEntity
         return $this->userName;
     }
 
+    public function setUserName(string $userName): UserRepositoryEntity
+    {
+        $this->userName = $userName;
+        return $this;
+    }
+
     public function getRepositoryName(): string
     {
         return $this->repositoryName;
+    }
+
+    public function setRepositoryName(string $repositoryName): UserRepositoryEntity
+    {
+        $this->repositoryName = $repositoryName;
+        return $this;
     }
 
     public function getClassWords(): array

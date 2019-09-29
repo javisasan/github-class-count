@@ -45,7 +45,7 @@ class UserRepositoryManager
         }
 
         if (empty($srcFolderSha)) {
-            throw new \Exception('Error: Repository does not contain src directory.');
+            throw new \Exception('Error: Given GitHub Repository does not contain src directory.');
         }
 
         $this->processGithubRecursiveTree($srcFolderSha);

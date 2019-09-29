@@ -2,26 +2,45 @@
 
 namespace App\Controller;
 
+use App\Entity\UserRepositoryEntity;
 use App\Infrastructure\Service\GithubApiManager;
 use App\Infrastructure\Service\UserRepositoryManager;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 
 class DefaultController extends AbstractController
 {
-    public function index()
+    public function index(Request $request)
     {
-        $user = 'javisasan';
-        $repo = 'symfony3-crud';
+        $userRepositoryEntity = new UserRepositoryEntity('', '', null, null);
+        $githubData = [];
 
-        $userRepositoryManager = new UserRepositoryManager(new GithubApiManager(), $user, $repo);
+        $form = $this->createFormBuilder($userRepositoryEntity)
+            ->add('userName', TextType::class, ['label' => 'User name'])
+            ->add('repositoryName', TextType::class, ['label' => 'Repository name'])
+            ->add('Search', SubmitType::class)
+            ->getForm();
 
-        $userRepositoryEntity = $userRepositoryManager->execute();
+        $form->handleRequest($request);
 
-        dump($userRepositoryEntity->getClassWords());
+        if ($form->isSubmitted() && $form->isValid()) {
+            $formData = $form->getData();
 
-        echo $userRepositoryEntity->getRateLimit()->__toString();
+            $userRepositoryManager = new UserRepositoryManager(new GithubApiManager(), $formData->getUserName(), $formData->getRepositoryName());
 
-        die;
+            $userRepositoryEntity = $userRepositoryManager->execute();
 
+            $githubData = [
+                'wordList'  => $userRepositoryEntity->getClassWords(),
+                'rateLimit' => $userRepositoryEntity->getRateLimit()->__toString()
+            ];
+        }
+
+        return $this->render('base.html.twig', [
+            'form' => $form->createView(),
+            'githubData' => $githubData
+        ]);
     }
 }
