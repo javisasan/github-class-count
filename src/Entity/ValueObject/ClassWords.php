@@ -18,7 +18,10 @@ class ClassWords
 
     public function addFromFilePath($path)
     {
-        $fileName = substr($path, strrpos($path, '/')+1, -4);
+        $fileNamePositionBegin = intval(strrpos($path, DIRECTORY_SEPARATOR));
+        $fileNamePositionBegin > 0 ? $fileNamePositionBegin += 1 : $fileNamePositionBegin;
+
+        $fileName = substr($path, $fileNamePositionBegin, -self::EXTENSION_LENGTH);
 
         $totalMatches = preg_match_all("/[A-Z][a-z]*[^A-Z]/", $fileName, $matches);
 
